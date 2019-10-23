@@ -20,7 +20,10 @@ class IllegalFormatString extends Inspection("Illegal format string", Levels.Err
           case Apply(Select(Apply(Select(_, TermName("augmentString")), List(Literal(Constant(format)))),
             TermName("format")), _) =>
             val argCount = argRegex.findAllIn(format.toString).matchData.size
+            warning(s">>>>>>>>>>>>> Arg count $argCount")
             val args = Nil.padTo(argCount, null)
+            warning(s">>>>>>>>>>>>> Args $args")
+            warning(s">>>>>>>>>>>>> Format ${format.toString}")
             try {
               String.format(format.toString, args: _*)
             } catch {
