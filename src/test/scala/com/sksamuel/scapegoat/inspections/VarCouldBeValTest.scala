@@ -190,6 +190,17 @@ class VarCouldBeValTest
         compileCodeSnippet(code)
         compiler.scapegoat.feedback.warnings.size shouldBe 0
       }
+      "when var is used to define a tuple" in {
+        val code =
+          """
+            |object Test {
+            |  var (alef, bet) = (1, 2)
+            |  bet = 3
+            |}
+        """.stripMargin
+        compileCodeSnippet(code)
+        compiler.scapegoat.feedback.warnings.size shouldBe 0
+      }
     }
   }
 }
