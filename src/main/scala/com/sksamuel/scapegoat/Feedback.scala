@@ -5,7 +5,8 @@ import scala.reflect.internal.util.Position
 import scala.tools.nsc.reporters.Reporter
 
 /** @author Stephen Samuel */
-class Feedback(consoleOutput: Boolean, reporter: Reporter, sourcePrefix: String, minimalLevel: Level = Levels.Info) {
+class Feedback(consoleOutput: Boolean, reporter: Reporter, sourcePrefix: String, minimalLevel: Level = Levels.Info,
+               dontFail: Boolean) {
 
   private val warningsBuffer = new ListBuffer[Warning]
 
@@ -36,11 +37,15 @@ class Feedback(consoleOutput: Boolean, reporter: Reporter, sourcePrefix: String,
       println()
     }
 
-    adjustedLevel match {
-      case Levels.Error   => reporter.error(pos, text)
-      case Levels.Warning => reporter.warning(pos, text)
-      case Levels.Info    => reporter.info(pos, text, force = false)
-    }
+    if (dontFail) {
+      reporter.info(pos, text, force = false)
+    } else {
+      adjustedLevel match {
+        case Levels.Error              => reporter.error(pos,text)
+        case Levels.Warning            => reporter.warning(pos, text)
+        case Levels.Info               => reporter.info(pos, text, force = false)
+      }
+    }   
   }
 
   private def normalizeSourceFile(sourceFile: String): String = {

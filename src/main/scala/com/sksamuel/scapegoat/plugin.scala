@@ -29,6 +29,10 @@ class ScapegoatPlugin(val global: Global) extends Plugin {
       case Some(option) => component.consoleOutput = option.drop("consoleOutput:".length).toBoolean
       case _            =>
     }
+    forProperty("dontFail:") match {
+      case Some(option) => component.dontFail = option.drop("dontFail:".length).toBoolean
+      case _            =>
+    }
     forProperty("ignoredFiles:") match {
       case Some(option) => component.ignoredFiles = option.drop("ignoredFiles:".length).split(':').toList
       case _            =>
@@ -115,6 +119,7 @@ class ScapegoatPlugin(val global: Global) extends Plugin {
     "                                                     files to ignore.",
     "-P:scapegoat:verbose:<boolean>                       enable/disable verbose console messages",
     "-P:scapegoat:consoleOutput:<boolean>                 enable/disable console report output",
+    "-P:scapegoat:dontFail:<boolean>			  when enabled, errors don't cause compilation to fail",
     "-P:scapegoat:reports:<reports>                       colon separated list of reports to generate.",
     "                                                     Valid options are `xml', `html', `scalastyle',",
     "                                                     or `all'. Use `none' to disable reports.",
@@ -157,6 +162,7 @@ class ScapegoatComponent(val global: Global, inspections: Seq[Inspection])
   var customInpections: Seq[Inspection] = Nil
   var sourcePrefix = "src/main/scala/"
   var minimalLevel: Level = Levels.Info
+  var dontFail: Boolean = false
 
   private val count = new AtomicInteger(0)
 
@@ -175,7 +181,7 @@ class ScapegoatComponent(val global: Global, inspections: Seq[Inspection])
       .filter(inspection => enabledInspections.contains(inspection.getClass.getSimpleName))
     }
   }
-  lazy val feedback = new Feedback(consoleOutput, global.reporter, sourcePrefix, minimalLevel)
+  lazy val feedback = new Feedback(consoleOutput, global.reporter, sourcePrefix, minimalLevel, dontFail)
 
   override def newPhase(prev: scala.tools.nsc.Phase): Phase = new Phase(prev) {
     override def run(): Unit = {
