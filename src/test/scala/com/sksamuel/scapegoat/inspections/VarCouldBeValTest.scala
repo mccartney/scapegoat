@@ -194,8 +194,11 @@ class VarCouldBeValTest
         val code =
           """
             |object Test {
-            |  var (alef, bet) = (1, 2)
-            |  bet = 3
+            |  def method: Int = {
+            |   var (alef, bet) = (1, 2)
+            |   bet = 3
+            |   alef
+            |  }
             |}
         """.stripMargin
         compileCodeSnippet(code)
