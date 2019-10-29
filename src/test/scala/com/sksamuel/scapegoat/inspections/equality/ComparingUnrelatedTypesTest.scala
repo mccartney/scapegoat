@@ -12,6 +12,7 @@ class ComparingUnrelatedTypesTest extends FreeSpec with Matchers with PluginRunn
   private def verifyNoWarnings(code: String): Unit = {
     compileCodeSnippet(code)
     compiler.scapegoat.feedback.warnings.size shouldBe 0
+    compiler.scapegoat.feedback.errors.size shouldBe 0
   }
 
   "ComparingUnrelatedTypes" - {
@@ -111,6 +112,9 @@ class ComparingUnrelatedTypesTest extends FreeSpec with Matchers with PluginRunn
       "for long" - {
         "compared to zero" in { verifyNoWarnings("""object A { val l = 100l; val b = l == 0 }""") }
         "compared to int literal" in { verifyNoWarnings("""object A { val l = 100l; val b = l == 100 }""") }
+      }
+      "for Java long vs. Scala long" - {
+        "compared to Java long literal" in { verifyNoWarnings("""object A { val j: java.long.Long = 5L; val s: Long = 6L; j == s }""") }
       }
       "for char" - {
         "compared to char-sized long literal" in { verifyNoWarnings("""object A { val c = 'a'; val c = l == 97L }""") }
