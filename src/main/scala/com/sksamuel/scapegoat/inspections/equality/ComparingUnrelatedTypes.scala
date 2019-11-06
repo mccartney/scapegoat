@@ -60,8 +60,10 @@ class ComparingUnrelatedTypes extends Inspection("Comparing unrelated types", Le
               } else {
                 (lt.erasure, rt.erasure)
               }
+              println(s">>>>>>>>>>>>> l = $l [$lt : ${lt.getClass}] ($lTypeSymbol), r = $r [$rt : ${rt.getClass}] ($rTypeSymbol), $lhs, $rhs")
 
               if (!related(l, r)) {
+                println(s">>>>>>>> FAILED")
                 warn()
               } else {
                 lt.typeArgs.zip(rt.typeArgs).foreach {
