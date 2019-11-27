@@ -129,6 +129,7 @@ object ScapegoatConfig extends App {
     new UnsafeContains,
     new UnsafeStringContains,
     new UnusedMethodParameter,
+    new UnusedPrivateMethod,
     new UseCbrt,
     new UseExpM1,
     new UseLog10,
