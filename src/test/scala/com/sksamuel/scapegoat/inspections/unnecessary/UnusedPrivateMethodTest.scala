@@ -23,6 +23,23 @@ class UnusedPrivateMethodTest extends FreeSpec
         compiler.scapegoat.feedback.warnings.size shouldBe 1
       }
     }
+
+    "should not report warning" - {
+      "for a private method which is called in another method" in {
+        val code =
+          """class Test {
+            | private def foo(a:String, b:Int, c:Int) {
+            |   s"$a $b $c"
+            | }
+            | def bar(): Unit = {
+            |   println(foo("a", 1, 2))
+            | }
+            |}""".stripMargin
+
+        compileCodeSnippet(code)
+        compiler.scapegoat.feedback.warnings.size shouldBe 0
+      }
+    }
   }
 }
 

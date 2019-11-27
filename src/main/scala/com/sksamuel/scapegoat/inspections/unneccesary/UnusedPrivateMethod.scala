@@ -2,7 +2,7 @@ package com.sksamuel.scapegoat.inspections.unneccesary
 
 import com.sksamuel.scapegoat._
 
-import scala.collection.mutable.{Set => MutableSet}
+import scala.collection.mutable.{Map => MutableMap}
 
 class UnusedPrivateMethod extends Inspection("Unused private method", Levels.Warning) {
 
@@ -12,27 +12,28 @@ class UnusedPrivateMethod extends Inspection("Unused private method", Levels.War
       import context.global._
       import definitions._
 
-      private val methodsNotSeenYet = MutableSet[String]()
+      private val methodsNotSeenYet = MutableMap[String, Tree]()
 
       override final def inspect(tree: Tree): Unit = {
         tree match {
           case ClassDef(_, _, _, template) =>
-            val methodsDeclaredAtThisLevel = template.children.collect {
-              case DefDef(mods, TermName(name), _, _, _, _) if mods.hasFlag(Flag.PRIVATE) =>
-                name
-            }
+            val methodsDeclaredAtThisLevel: Map[String, Tree] = template.children.collect {
+              case d@DefDef(mods, TermName(name), _, _, _, _) if mods.hasFlag(Flag.PRIVATE) =>
+                name -> d
+            }.toMap
             methodsNotSeenYet ++= methodsDeclaredAtThisLevel
             continue(tree)
-            methodsNotSeenYet.foreach { name =>
-              context.warn(tree.pos, self, s"Dead code - private method $name not used anywhere: " + tree.toString().take(200))
+            methodsNotSeenYet.foreach { case (name, methodTree) =>
+              context.warn(methodTree.pos, self, s"Dead code - private method $name not used anywhere: " + tree.toString().take(200))
             }
-            methodsNotSeenYet --= methodsDeclaredAtThisLevel
+            methodsNotSeenYet --= methodsDeclaredAtThisLevel.keys
 
-          case Ident(TermName(name)) =>
+          case Select(_, TermName(name)) =>
             methodsNotSeenYet -= name
             continue(tree)
 
-          case _ => continue(tree)
+          case _ =>
+            continue(tree)
         }
       }
     }
