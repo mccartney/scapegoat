@@ -39,7 +39,20 @@ class UnusedPrivateMethodTest extends FreeSpec
         compileCodeSnippet(code)
         compiler.scapegoat.feedback.warnings.size shouldBe 0
       }
+      "for a private field (val) which is not used" in {
+        val code =
+          """class Test {
+            | private val x = 3
+            | def bar(): Unit = {
+            |   println("Four")
+            | }
+            |}""".stripMargin
+
+        compileCodeSnippet(code)
+        compiler.scapegoat.feedback.warnings.size shouldBe 0
+      }
     }
+
   }
 }
 

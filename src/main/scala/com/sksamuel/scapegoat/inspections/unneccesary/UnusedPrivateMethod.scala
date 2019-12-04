@@ -2,6 +2,7 @@ package com.sksamuel.scapegoat.inspections.unneccesary
 
 import com.sksamuel.scapegoat._
 
+import scala.reflect.internal.ModifierFlags
 import scala.collection.mutable.{Map => MutableMap}
 
 class UnusedPrivateMethod extends Inspection("Unused private method", Levels.Warning) {
@@ -18,8 +19,9 @@ class UnusedPrivateMethod extends Inspection("Unused private method", Levels.War
         tree match {
           case ClassDef(_, _, _, template) =>
             val methodsDeclaredAtThisLevel: Map[String, Tree] = template.children.collect {
-              case d@DefDef(mods, TermName(name), _, _, _, _) if mods.hasFlag(Flag.PRIVATE) =>
-                name -> d
+              case d@DefDef(mods, TermName(name), _, _, _, _) 
+                if mods.hasFlag(Flag.PRIVATE) && d.symbol.isMethod && !d.symbol.isAccessor =>
+                  name -> d
             }.toMap
             methodsNotSeenYet ++= methodsDeclaredAtThisLevel
             continue(tree)
