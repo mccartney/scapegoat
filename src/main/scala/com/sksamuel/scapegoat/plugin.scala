@@ -63,7 +63,7 @@ class ScapegoatComponent(val global: Global, inspections: Seq[Inspection])
     if (!isDisabled) {
       configuration.dataDir.foreach { outputDir =>
         val output = writer(outputDir, feedback)
-        if (configuration.verbose)
+        if (configuration.isVerbose)
           reporter.echo(s"[info] [scapegoat] Written $reportName report [$output]")
       }
     }
@@ -76,7 +76,7 @@ class ScapegoatComponent(val global: Global, inspections: Seq[Inspection])
           reporter.echo("[info] [scapegoat] All inspections disabled")
         else {
           reporter.echo(s"[info] [scapegoat] ${activeInspections.size} activated inspections")
-          if (configuration.verbose)
+          if (configuration.isVerbose)
             if (configuration.ignoredFiles.nonEmpty)
               reporter.echo(s"[info] [scapegoat] ${configuration.ignoredFiles} ignored file patterns")
           super.run()

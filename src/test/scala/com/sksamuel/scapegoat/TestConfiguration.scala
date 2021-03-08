@@ -7,8 +7,8 @@ object TestConfiguration {
     disabledInspections = List(),
     enabledInspections = List(),
     ignoredFiles = List(),
-    consoleOutput = false,
-    verbose = false,
+    consoleOutput = Some(false),
+    verbose = Some(false),
     reports = Reports(
       disableXML = true,
       disableHTML = true,
@@ -16,8 +16,8 @@ object TestConfiguration {
       disableMarkdown = true
     ),
     customInspectors = Seq(),
-    sourcePrefix = "src/main/scala",
-    minimalLevel = Levels.Info,
+    sourcePrefix = Some("src/main/scala"),
+    minimalLevel = Some(Levels.Info),
     overrideLevels = Map.empty[String, Level]
   )
 }

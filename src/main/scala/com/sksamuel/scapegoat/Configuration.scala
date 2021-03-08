@@ -14,14 +14,19 @@ case class Configuration(
   disabledInspections: List[String],
   enabledInspections: List[String],
   ignoredFiles: List[String],
-  consoleOutput: Boolean,
-  verbose: Boolean,
+  consoleOutput: Option[Boolean],
+  verbose: Option[Boolean],
   reports: Reports,
   customInspectors: Seq[Inspection],
-  sourcePrefix: String,
-  minimalLevel: Level,
+  sourcePrefix: Option[String],
+  minimalLevel: Option[Level],
   overrideLevels: Map[String, Level]
-)
+) {
+  def isVerbose: Boolean = verbose.getOrElse(false)
+  def getMinimalLevel: Level = minimalLevel.getOrElse(Levels.Info)
+  def shouldOutputToConsole: Boolean = consoleOutput.getOrElse(true)
+  def getSourcePrefix: String = sourcePrefix.getOrElse("src/main/scala/")
+}
 
 object Configuration {
 
@@ -40,10 +45,11 @@ object Configuration {
       fromProperty("disabledInspections", defaultValue = List.empty[String])(_.split(':').toList)
     val enabledInspections =
       fromProperty("enabledInspections", defaultValue = List.empty[String])(_.split(':').toList)
-    val consoleOutput = fromProperty("consoleOutput", defaultValue = true)(_.toBoolean)
+    val consoleOutput =
+      fromProperty[Option[Boolean]]("consoleOutput", defaultValue = None)(x => Some(x.toBoolean))
     val ignoredFiles =
       fromProperty("ignoredFiles", defaultValue = List.empty[String])(_.split(':').toList)
-    val verbose = fromProperty("verbose", defaultValue = false)(_.toBoolean)
+    val verbose = fromProperty[Option[Boolean]]("verbose", defaultValue = None)(x => Some(x.toBoolean))
 
     val customInspectors = fromProperty("customInspectors", defaultValue = Seq.empty[Inspection]) {
       _.split(':').toSeq
@@ -71,9 +77,9 @@ object Configuration {
           }
         }.toMap
       }
-    val sourcePrefix = fromProperty("sourcePrefix", defaultValue = "src/main/scala/")(x => x)
-    val minimalLevel = fromProperty[Level]("minimalLevel", defaultValue = Levels.Info) { value =>
-      Levels.fromName(value)
+    val sourcePrefix = fromProperty[Option[String]]("sourcePrefix", defaultValue = None)(x => Some(x))
+    val minimalLevel = fromProperty[Option[Level]]("minimalLevel", defaultValue = None) { value =>
+      Some(Levels.fromName(value))
     }
     val dataDir = fromProperty[Option[File]](
       "dataDir",

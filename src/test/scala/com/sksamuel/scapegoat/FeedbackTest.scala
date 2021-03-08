@@ -198,8 +198,8 @@ class FeedbackTest extends AnyFreeSpec with Matchers with OneInstancePerTest wit
     minimalLevel: Level = Levels.Info
   ) =
     TestConfiguration.configuration.copy(
-      consoleOutput = consoleOutput,
-      sourcePrefix = sourcePrefix,
-      minimalLevel = minimalLevel
+      consoleOutput = Some(consoleOutput),
+      sourcePrefix = Some(sourcePrefix),
+      minimalLevel = Some(minimalLevel)
     )
 }

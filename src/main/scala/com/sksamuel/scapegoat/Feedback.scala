@@ -16,9 +16,9 @@ class Feedback(
 
   def warnings: Seq[Warning] = warningsBuffer.toSeq
   def warningsWithMinimalLevel: Seq[Warning] =
-    warnings.filter(_.hasMinimalLevelOf(configuration.minimalLevel))
+    warnings.filter(_.hasMinimalLevelOf(configuration.getMinimalLevel))
   def shouldPrint(warning: Warning): Boolean =
-    configuration.consoleOutput && warning.hasMinimalLevelOf(configuration.minimalLevel)
+    configuration.shouldOutputToConsole && warning.hasMinimalLevelOf(configuration.getMinimalLevel)
 
   def infos = warnings(Levels.Info)
   def errors = warnings(Levels.Error)
@@ -72,7 +72,7 @@ class Feedback(
   }
 
   private def normalizeSourceFile(sourceFile: String): String = {
-    val sourcePrefix = configuration.sourcePrefix
+    val sourcePrefix = configuration.getSourcePrefix
     val indexOf = sourceFile.indexOf(sourcePrefix)
     val fullPrefix = if (sourcePrefix.endsWith("/")) sourcePrefix else s"$sourcePrefix/"
     val packageAndFile = if (indexOf == -1) sourceFile else sourceFile.drop(indexOf).drop(fullPrefix.length)
